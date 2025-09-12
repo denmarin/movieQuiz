@@ -4,8 +4,8 @@
 <dict>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Resources/MovieQuizFonts/YSDisplay-Bold.ttf</string>
-		<string>Resources/MovieQuizFonts/YSDisplay-Medium.ttf</string>
+		<string>YSDisplay-Bold.ttf</string>
+		<string>YSDisplay-Medium.ttf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
