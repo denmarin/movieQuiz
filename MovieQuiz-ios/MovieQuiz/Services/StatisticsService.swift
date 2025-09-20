@@ -7,7 +7,7 @@
 
 import Foundation
 
-class StatisticsService: StatisticServiceProtocol {
+class StatisticService: StatisticServiceProtocol {
    
     private let ud = UserDefaults.standard
     
