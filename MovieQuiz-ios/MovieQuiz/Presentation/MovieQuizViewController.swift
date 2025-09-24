@@ -20,7 +20,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
     private var alertPresenter: AlertPresenter?
-    private var statistics: StatisticServiceProtocol = StatisticService()
+    private var statistics: StatisticsServiceProtocol = StatisticsService()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,7 +29,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter = AlertPresenter(viewController: self)
         
-        showActivityIndicator()
+        showLoadingState()
         Task { [weak self] in
             guard let self = self else { return }
             await self.questionFactory?.loadData()
@@ -44,7 +44,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func didLoadDataFromServer() {
-        hideActivityIndicator()
+        // Data is ready, request the first question; UI will be shown when the question arrives
         questionFactory?.requestNextQuestion()
     }
     
@@ -54,8 +54,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
         currentQuestion = question
         let viewModel = convert(model: question)
-        
         DispatchQueue.main.async { [weak self] in
+            self?.showContentState()
             self?.show(quiz: viewModel)
         }
     }
@@ -86,19 +86,35 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     // MARK: - Private functions
-    
-    private func showActivityIndicator() {
-        activityIndicator.isHidden = false
+
+    private func showLoadingState() {
+        // Show only activity indicator and block interactions
         activityIndicator.startAnimating()
+        imageView.isHidden = true
+        textLabel.isHidden = true
+        counterLabel.isHidden = true
+        questionSign.isHidden = true
+        yesButton.isHidden = true
+        noButton.isHidden = true
+        yesButton.isEnabled = false
+        noButton.isEnabled = false
     }
-    
-    private func hideActivityIndicator() {
-        activityIndicator.isHidden = true
+
+    private func showContentState() {
+        // Hide activity indicator and reveal content
         activityIndicator.stopAnimating()
+        imageView.isHidden = false
+        textLabel.isHidden = false
+        counterLabel.isHidden = false
+        questionSign.isHidden = false
+        yesButton.isHidden = false
+        noButton.isHidden = false
+        yesButton.isEnabled = true
+        noButton.isEnabled = true
     }
     
     private func showNetworkError(message: String) {
-        hideActivityIndicator()
+        activityIndicator.stopAnimating()
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             let model = AlertModel(
@@ -107,7 +123,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 buttonText: "Попробовать ещё раз"
             ) { [weak self] in
                 guard let self = self else { return }
-                self.showActivityIndicator()
+                self.showLoadingState()
                 Task { [weak self] in
                     guard let self = self else { return }
                     await self.questionFactory?.loadData()
@@ -125,7 +141,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         return questionStep
     }
     
-    
     private func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
         textLabel.text = step.question
@@ -133,16 +148,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         imageView.layer.borderWidth = 0
         imageView.layer.borderColor = UIColor.clear.cgColor
-        
-        textLabel.isHidden = false
-        counterLabel.isHidden = false
-        questionSign.isHidden = false
-        yesButton.isHidden = false
-        noButton.isHidden = false
-        imageView.isHidden = false
-        
-        yesButton.isEnabled = true
-        noButton.isEnabled = true
     }
     
     
@@ -190,7 +195,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                     self.correctAnswers = 0
                     self.currentQuestion = nil
                     
-                    self.showActivityIndicator()
+                    self.showLoadingState()
                     Task { [weak self] in
                         guard let self = self else { return }
                         await self.questionFactory?.loadData()

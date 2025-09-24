@@ -7,8 +7,8 @@
 
 import Foundation
 
-class StatisticService: StatisticServiceProtocol {
-   
+class StatisticsService: StatisticsServiceProtocol {
+
     private let ud = UserDefaults.standard
     
     private var totalCorrectAnswers: Int {
@@ -32,6 +32,10 @@ class StatisticService: StatisticServiceProtocol {
     
     var bestGame: GameResult {
         get {
+            let hasBest = ud.object(forKey: Keys.bestGameDate.rawValue) != nil
+            if !hasBest {
+                return GameResult(correct: 0, total: 0, date: Date.distantPast)
+            }
             let correctAnswers = ud.integer(forKey: Keys.bestGameCorrect.rawValue)
             let questionsInQuiz = ud.integer(forKey: Keys.bestGameTotal.rawValue)
             let date = ud.object(forKey: Keys.bestGameDate.rawValue) as? Date ?? Date()
@@ -61,10 +65,10 @@ class StatisticService: StatisticServiceProtocol {
         let currentBest = bestGame
 
         
-        let newAccuracy = Double(count) / Double(max(amount, 1))
-        let bestAccuracy = Double(currentBest.correct) / Double(max(currentBest.total, 1))
+        let newAccuracy = amount > 0 ? Double(count) / Double(amount) : 0
+        let bestAccuracy = currentBest.total > 0 ? Double(currentBest.correct) / Double(currentBest.total) : -1
 
-        if newAccuracy > bestAccuracy || (newAccuracy == bestAccuracy && count > currentBest.correct) {
+        if newAccuracy > bestAccuracy {
             bestGame = newResult
         }
     }
@@ -79,3 +83,4 @@ class StatisticService: StatisticServiceProtocol {
     }
     
 }
+
