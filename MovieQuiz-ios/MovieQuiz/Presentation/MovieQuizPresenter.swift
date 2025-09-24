@@ -17,8 +17,8 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var statistics: StatisticsServiceProtocol!
     private weak var VC: MovieQuizViewController?
     
-    init(viewController: MovieQuizViewController) {
-        self.VC = viewController
+    init(viewController: MovieQuizViewControllerProtocol) {
+        self.VC = viewController as? MovieQuizViewController
         statistics = StatisticsService()
             
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
@@ -100,7 +100,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         currentQuestionIndex += 1
     }
     
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
+    func convert(model: QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
             image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,

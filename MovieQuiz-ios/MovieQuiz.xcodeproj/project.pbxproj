@@ -89,6 +89,7 @@
 			membershipExceptions = (
 				ArrayTests.swift,
 				FormatTests.swift,
+				MovieQuizPresenterTests.swift,
 				MoviesLoaderTests.swift,
 				QuestionFactoryTests.swift,
 				StatisticsServiceTests.swift,
