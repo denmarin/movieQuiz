@@ -23,9 +23,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
             
-        Task {
-            await questionFactory?.loadData()
-        }
         VC?.showLoadingState()
     }
     

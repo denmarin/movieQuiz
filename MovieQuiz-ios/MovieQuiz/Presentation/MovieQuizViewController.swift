@@ -32,8 +32,13 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         
         alertPresenter = AlertPresenter(viewController: self)
         
+        Task {
+            await presenter.questionFactory?.loadData()
+        }
+        
         showLoadingState()
         _ = presenter
+        
     }
     
     // MARK: - Actions
